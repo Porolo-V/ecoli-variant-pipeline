@@ -1,0 +1,23 @@
+POS	REF	ALT	QUAL	DP	MQ	EFFECT	IMPACT	GENE	PROTEIN_CHANGE	FLAG
+9972	T	G	225.417	83	60	missense_variant	MODERATE	satP	p.Asn174Thr	
+281923	G	T	225.417	74	60	upstream_gene_variant	MODIFIER	ecpD		
+433359	CTTTTTTT	CTTTTTTTT	228.395	81	60	upstream_gene_variant	MODIFIER	ECB_RS02045		
+473901	CCGC	CCGCGC	228.41	70	60	frameshift_variant	HIGH	ybaL	p.Ala469fs	
+648692	C	T	225.417	92	60	missense_variant	MODERATE	mrdB	p.Arg69His	
+1331794	C	A	225.417	53	60	missense_variant	MODERATE	topA	p.Thr792Lys	
+1733343	G	A	225.417	93	60	missense_variant	MODERATE	pykF	p.Asp127Asn	
+2103887	ACAGCCAGCCAGCCAGCCAGCCAGCCAGCCAG	ACAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAGCCAG	174.921	28	58.56	disruptive_inframe_insertion	MODERATE	ECB_RS23820	p.Ser54_Ala61dup	tandem_repeat
+2333538	AT	ATT	228.406	80	60	downstream_gene_variant	MODIFIER	rbn		
+2446984	A	C	225.417	110	59.6078	missense_variant	MODERATE	ECB_RS26305	p.Ile6Met	
+2665639	A	T	225.417	104	60	missense_variant	MODERATE	rplS	p.Leu100Gln	
+2999330	G	A	225.417	90	60	upstream_gene_variant	MODIFIER	speC		
+3339313	A	C	225.417	95	60	missense_variant	MODERATE	fis	p.Tyr51Ser	
+3401754	C	A	225.417	96	60	missense_variant	MODERATE	rpsG	p.Arg78Leu	
+3481820	A	G	225.417	70	60	missense_variant	MODERATE	malT	p.Thr46Ala	
+3488669	A	C	225.417	59	60	missense_variant	MODERATE	ECB_RS17315	p.Ser180Ala	
+3901455	A	AC	225.417	16	60	frameshift_variant	HIGH	mdtD	p.Leu322fs	low_depth_or_repeat
+3909807	G	T	225.417	82	60	upstream_gene_variant	MODIFIER	hdfR		
+4100183	A	G	225.417	90	60	missense_variant	MODERATE	hslU	p.Ser350Pro	
+4201958	A	C	225.417	75	60	missense_variant	MODERATE	iclR	p.Leu201Arg	
+4431393	TGG	T	228.408	77	60	frameshift_variant	HIGH	tamB	p.Gly1176fs	
+4616538	A	C	225.417	90	60	missense_variant	MODERATE	nadR	p.Tyr337Ser	
