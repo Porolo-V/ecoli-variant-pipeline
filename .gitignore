@@ -2,3 +2,5 @@ data/
 results/
 work/
 .nextflow*
+results_check/
+run_check.log
