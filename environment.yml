@@ -1,0 +1,15 @@
+name: varcall
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - sra-tools
+  - entrez-direct
+  - fastqc
+  - multiqc
+  - fastp
+  - bwa-mem2
+  - samtools
+  - bcftools
+  - snpeff
+  - nextflow
