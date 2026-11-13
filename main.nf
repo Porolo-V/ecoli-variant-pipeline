@@ -22,7 +22,96 @@ process FASTP {
     """
 }
 
+process BWA_INDEX {
+    input:
+    path ref
+
+    output:
+    tuple path(ref), path("${ref}.*"), emit: index
+
+    script:
+    """
+    bwa-mem2 index ${ref}
+    """
+}
+
+process ALIGN {
+    publishDir "${params.outdir}/aligned", mode: 'copy'
+
+    input:
+    tuple val(id), path(r1), path(r2)
+    tuple path(ref), path(index_files)
+
+    output:
+    tuple val(id), path("${id}.sorted.bam"), path("${id}.sorted.bam.bai"), emit: bam
+    path "${id}.flagstat.txt"
+
+    script:
+    """
+    bwa-mem2 mem -t ${task.cpus} \\
+      -R '@RG\\tID:${id}\\tSM:${id}\\tPL:ILLUMINA' \\
+      ${ref} ${r1} ${r2} \\
+      | samtools sort -@ ${task.cpus} -o ${id}.sorted.bam -
+    samtools index ${id}.sorted.bam
+    samtools flagstat ${id}.sorted.bam > ${id}.flagstat.txt
+    """
+}
+process MARKDUP {
+    publishDir "${params.outdir}/aligned", mode: 'copy'
+
+    input:
+    tuple val(id), path(bam), path(bai)
+
+    output:
+    tuple val(id), path("${id}.dedup.bam"), path("${id}.dedup.bam.bai"), emit: bam
+    path "${id}.dedup.flagstat.txt"
+    path "${id}.coverage.tsv"
+
+    script:
+    """
+    samtools sort -n -@ ${task.cpus} ${bam} \\
+      | samtools fixmate -m - - \\
+      | samtools sort -@ ${task.cpus} - \\
+      | samtools markdup -r - ${id}.dedup.bam
+    samtools index ${id}.dedup.bam
+    samtools flagstat ${id}.dedup.bam > ${id}.dedup.flagstat.txt
+    samtools coverage ${id}.dedup.bam > ${id}.coverage.tsv
+    """
+}
+
+process CALL_VARIANTS {
+    publishDir "${params.outdir}/variants", mode: 'copy'
+
+    input:
+    tuple val(id), path(bam), path(bai)
+    tuple path(ref), path(index_files)
+    path fai
+
+    output:
+    tuple val(id), path("${id}.filtered.vcf.gz"), path("${id}.filtered.vcf.gz.csi"), emit: vcf
+    path "${id}.raw.vcf.gz"
+
+    script:
+    """
+    bcftools mpileup -Ou -f ${ref} ${bam} \\
+      | bcftools call -mv --ploidy 1 -Oz -o ${id}.raw.vcf.gz
+    bcftools index ${id}.raw.vcf.gz
+    bcftools filter \\
+      -i 'QUAL>${params.min_qual} && INFO/DP>${params.min_dp} && INFO/MQ>${params.min_mq}' \\
+      -Oz -o ${id}.filtered.vcf.gz ${id}.raw.vcf.gz
+    bcftools index ${id}.filtered.vcf.gz
+    echo "raw: \$(bcftools view -H ${id}.raw.vcf.gz | wc -l)  filtered: \$(bcftools view -H ${id}.filtered.vcf.gz | wc -l)"
+    """
+}
+
 workflow {
     reads_ch = channel.fromFilePairs(params.reads, checkIfExists: true)
+    ref_ch   = channel.fromPath(params.ref, checkIfExists: true)
+    fai_ch   = channel.fromPath("${params.ref}.fai", checkIfExists: true)
+
     FASTP(reads_ch)
+    BWA_INDEX(ref_ch)
+    ALIGN(FASTP.out.reads, BWA_INDEX.out.index)
+    MARKDUP(ALIGN.out.bam)
+    CALL_VARIANTS(MARKDUP.out.bam, BWA_INDEX.out.index, fai_ch)
 }
