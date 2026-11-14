@@ -83,9 +83,13 @@ The test dataset checks this: position 263235 must be present in the raw VCF and
 ## Repository layout
 
 main.nf, nextflow.config Nextflow pipeline and parameters
+
 scripts/run_all.sh bash version of the full workflow
+
 tests/data/ 300 kb subset for the test profile
+
 docs/ variant table, figures
+
 environment.yml conda environment
 
 
