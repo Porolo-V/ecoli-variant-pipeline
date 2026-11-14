@@ -82,11 +82,15 @@ MQ 22-30, у 23-39% ридов MQ=0, а риды разделились межд
 
 ## Структура репозитория
 
-main.nf, nextflow.config пайплайн на Nextflow и параметры
-scripts/run_all.sh bash-версия всего анализа
-tests/data/ подмножество 300 тыс. п.н. для профиля test
-docs/ таблица вариантов, рисунки
-environment.yml окружение conda
+main.nf, nextflow.config пайплайн на Nextflow и параметры 
+
+scripts/run_all.sh bash-версия всего анализа 
+
+tests/data/ подмножество 300 тыс. п.н. для профиля test 
+
+docs/ таблица вариантов, рисунки 
+
+environment.yml окружение conda 
 
 
 ## Планы
