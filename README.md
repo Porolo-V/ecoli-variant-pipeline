@@ -72,13 +72,14 @@ The test dataset checks this: position 263235 must be present in the raw VCF and
 - Indels in homopolymers and repeats are less reliable with short reads.
 - The variant table takes the first snpEff `ANN` entry, so intergenic variants can appear as `upstream_gene_variant`.
 - `--ploidy 1` is hard-coded in the calling step; other organisms need parameters (planned).
-- The Nextflow version was tested on the 300 kb subset only.
+- The Nextflow version was tested on the 300 kb subset, including two samples in parallel (not yet on the full sample).
 
 ## Problems encountered
 
 - Slow connections to GitHub/NCBI/ENA: solved with multi-connection download (`aria2c -x 8`) from ENA.
 - FastQC 0.13 uses `--outdir` instead of `-o`.
 - The `.gitignore` rule `data/` also ignored `tests/data`; fixed by anchoring it (`/data/`).
+- With several samples only one was processed after alignment: single-file channels (reference, index) are consumed by default. Fixed with value channels and verified with a two-sample run.
 
 ## Repository layout
 
