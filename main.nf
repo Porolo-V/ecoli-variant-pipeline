@@ -145,7 +145,7 @@ workflow {
 
     FASTP(reads_ch)
     BWA_INDEX(ref_ch)
-    index_ch = BWA_INDEX.out.index.first()
+    index_ch = BWA_INDEX.out.index
 
     ALIGN(FASTP.out.reads, index_ch)
     MARKDUP(ALIGN.out.bam)
