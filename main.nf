@@ -137,14 +137,18 @@ process ANNOTATE {
 
 workflow {
     reads_ch = channel.fromFilePairs(params.reads, checkIfExists: true)
-    ref_ch   = channel.fromPath(params.ref, checkIfExists: true)
-    fai_ch   = channel.fromPath("${params.ref}.fai", checkIfExists: true)
-    gbk_ch   = channel.fromPath(params.gbk, checkIfExists: true)
+
+    // single files shared by ALL samples -> value channels (.first())
+    ref_ch = channel.fromPath(params.ref, checkIfExists: true).first()
+    fai_ch = channel.fromPath("${params.ref}.fai", checkIfExists: true).first()
+    gbk_ch = channel.fromPath(params.gbk, checkIfExists: true).first()
 
     FASTP(reads_ch)
     BWA_INDEX(ref_ch)
-    ALIGN(FASTP.out.reads, BWA_INDEX.out.index)
+    index_ch = BWA_INDEX.out.index.first()
+
+    ALIGN(FASTP.out.reads, index_ch)
     MARKDUP(ALIGN.out.bam)
-    CALL_VARIANTS(MARKDUP.out.bam, BWA_INDEX.out.index, fai_ch)
+    CALL_VARIANTS(MARKDUP.out.bam, index_ch, fai_ch)
     ANNOTATE(CALL_VARIANTS.out.vcf, gbk_ch)
 }
