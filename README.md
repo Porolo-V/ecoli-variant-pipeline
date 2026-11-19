@@ -1,6 +1,6 @@
 # E. coli variant calling pipeline
 
-🇬🇧 English | [🇷🇺 Русский](README.ru.md)
+🇬🇧 English | [🇷🇺 Русский](README.ru.md) [![pipeline-test](https://github.com/Porolo-V/ecoli-variant-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/Porolo-V/ecoli-variant-pipeline/actions/workflows/ci.yml)
 
 Reproducible short-read variant calling workflow: raw Illumina reads → filtered, annotated variants.
 Built on *E. coli* B REL606 (haploid, 4.6 Mb) as a first, deliberately simple case.
@@ -73,6 +73,8 @@ The test dataset checks this: position 263235 must be present in the raw VCF and
 - The variant table takes the first snpEff `ANN` entry, so intergenic variants can appear as `upstream_gene_variant`.
 - `--ploidy 1` is hard-coded in the calling step; other organisms need parameters (planned).
 - The Nextflow version was tested on the 300 kb subset, including two samples in parallel (not yet on the full sample).
+- The base image `mambaorg/micromamba:latest` is not pinned, and dependencies of the tools (e.g. openjdk, python) are not pinned individually; the resolved versions are listed in `docs/image_packages.txt`.
+- `bwa-mem2` is installed as package version 2.3, but the binary reports 2.2.1 (also in the original conda environment); the package version is the one recorded here.
 
 ## Problems encountered
 
@@ -83,17 +85,25 @@ The test dataset checks this: position 263235 must be present in the raw VCF and
 
 ## Repository layout
 
-main.nf, nextflow.config Nextflow pipeline and parameters
+```
+main.nf, nextflow.config   Nextflow pipeline and parameters
+scripts/run_all.sh         bash version of the full workflow
+tests/data/                300 kb read subset and reference for the test profile
+docs/                      variant table, image package list, figures
+environment.yml            conda environment
+Dockerfile                 tools image for the Nextflow processes
+.github/workflows/ci.yml   CI: build image, run test, check variants
+```
 
-scripts/run_all.sh bash version of the full workflow
+## Docker and CI
 
-tests/data/ 300 kb subset for the test profile
+The tools used by the Nextflow processes (fastp, bwa-mem2, samtools, bcftools, snpEff) are packaged in a Docker image built from `Dockerfile`; the five tools are pinned to the versions used for the results. The full package list is in [`docs/image_packages.txt`](docs/image_packages.txt).
 
-docs/ variant table, figures
+    docker build -t ecoli-varcall:0.2 - < Dockerfile
+    nextflow run . -profile test,docker
 
-environment.yml conda environment
-
+GitHub Actions (`.github/workflows/ci.yml`) builds the image and runs the test profile on every push. It checks the result, not only that the run finished: the filtered VCF must contain exactly positions 9972 and 281923, and position 263235 must be present in the raw VCF and removed by the MQ filter. The test is self-contained (the reference is stored in `tests/data/ref`).
 
 ## Roadmap
 
-Containers (BioContainers), GitHub Actions CI, ploidy and annotation parameters for other organisms.
+Per-tool BioContainers images, ploidy and annotation parameters for other organisms, multi-organism test datasets.
