@@ -1,0 +1,35 @@
+name: pipeline-test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: nf-core/setup-nextflow@v2
+        with:
+          version: "26.10.5"
+
+      - name: Build tools image
+        run: docker build -t ecoli-varcall:0.2 - < Dockerfile
+
+      - name: Run test profile
+        run: nextflow run . -profile test,docker
+
+      - name: Check results
+        run: |
+          gzip -dc results_test/variants/sub.filtered.vcf.gz | grep -v '^#' | cut -f2 | sort > got.txt
+          printf '9972\n281923\n' | sort > expected.txt
+          echo "filtered positions:"; cat got.txt
+          diff got.txt expected.txt
+
+          gzip -dc results_test/variants/sub.raw.vcf.gz | grep -v '^#' | cut -f2 > raw.txt
+          grep -qx 263235 raw.txt
+          echo "OK: 263235 is in the raw VCF and removed by the MQ filter"
